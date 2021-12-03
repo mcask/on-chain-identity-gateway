@@ -10,8 +10,11 @@ import {
   updateExpiry,
   findGatewayToken,
   getGatekeeperAccountKey,
+  State,
 } from "@identity.com/solana-gateway-ts";
+
 import { send } from "../util/connection";
+import { PROGRAM_ID } from "../util/constants";
 
 /**
  * Global default configuration for the gatekeeper
@@ -37,7 +40,8 @@ export class GatekeeperService {
     private payer: Keypair,
     private gatekeeperNetwork: PublicKey,
     private gatekeeperAuthority: Keypair,
-    private config: GatekeeperConfig = {}
+    private config: GatekeeperConfig = {},
+    private retrieveTokenAfterAction = false
   ) {}
 
   private getDefaultExpireTime(): number | undefined {
@@ -95,6 +99,17 @@ export class GatekeeperService {
       this.gatekeeperAuthority
     );
 
+    if (!this.retrieveTokenAfterAction) {
+      return new GatewayToken(
+        gatekeeperAccount,
+        this.gatekeeperNetwork,
+        owner,
+        State.ACTIVE,
+        gatewayTokenKey,
+        PROGRAM_ID,
+        expireTime
+      );
+    }
     return this.getGatewayTokenOrError(gatewayTokenKey);
   }
 
@@ -110,7 +125,10 @@ export class GatekeeperService {
    * Revoke the gateway token. The token must have been issued by a gatekeeper in the same network
    * @param gatewayTokenKey
    */
-  async revoke(gatewayTokenKey: PublicKey): Promise<GatewayToken> {
+  async revoke(
+    gatewayTokenKey: PublicKey,
+    owner?: PublicKey
+  ): Promise<GatewayToken> {
     const gatekeeperAccount = await getGatekeeperAccountKey(
       this.gatekeeperAuthority.publicKey,
       this.gatekeeperNetwork
@@ -130,6 +148,16 @@ export class GatekeeperService {
       this.gatekeeperAuthority
     );
 
+    if (!this.retrieveTokenAfterAction) {
+      return new GatewayToken(
+        gatekeeperAccount,
+        this.gatekeeperNetwork,
+        owner,
+        State.REVOKED,
+        gatewayTokenKey,
+        PROGRAM_ID
+      );
+    }
     return this.getGatewayTokenOrError(gatewayTokenKey);
   }
 
@@ -137,7 +165,10 @@ export class GatekeeperService {
    * Freeze the gateway token. The token must have been issued by this gatekeeper.
    * @param gatewayTokenKey
    */
-  async freeze(gatewayTokenKey: PublicKey): Promise<GatewayToken> {
+  async freeze(
+    gatewayTokenKey: PublicKey,
+    owner?: PublicKey
+  ): Promise<GatewayToken> {
     const gatekeeperAccount = await getGatekeeperAccountKey(
       this.gatekeeperAuthority.publicKey,
       this.gatekeeperNetwork
@@ -158,6 +189,16 @@ export class GatekeeperService {
       this.gatekeeperAuthority
     );
 
+    if (!this.retrieveTokenAfterAction) {
+      return new GatewayToken(
+        gatekeeperAccount,
+        this.gatekeeperNetwork,
+        owner,
+        State.FROZEN,
+        gatewayTokenKey,
+        PROGRAM_ID
+      );
+    }
     return this.getGatewayTokenOrError(gatewayTokenKey);
   }
 
@@ -165,7 +206,10 @@ export class GatekeeperService {
    * Unfreeze the gateway token. The token must have been issued by this gatekeeper.
    * @param gatewayTokenKey
    */
-  async unfreeze(gatewayTokenKey: PublicKey): Promise<GatewayToken> {
+  async unfreeze(
+    gatewayTokenKey: PublicKey,
+    owner?: PublicKey
+  ): Promise<GatewayToken> {
     const gatekeeperAccount = await getGatekeeperAccountKey(
       this.gatekeeperAuthority.publicKey,
       this.gatekeeperNetwork
@@ -186,6 +230,16 @@ export class GatekeeperService {
       this.gatekeeperAuthority
     );
 
+    if (!this.retrieveTokenAfterAction) {
+      return new GatewayToken(
+        gatekeeperAccount,
+        this.gatekeeperNetwork,
+        owner,
+        State.ACTIVE,
+        gatewayTokenKey,
+        PROGRAM_ID
+      );
+    }
     return this.getGatewayTokenOrError(gatewayTokenKey);
   }
 
@@ -206,7 +260,8 @@ export class GatekeeperService {
    */
   async updateExpiry(
     gatewayTokenKey: PublicKey,
-    expireTime: number
+    expireTime: number,
+    owner?: PublicKey
   ): Promise<GatewayToken> {
     const gatekeeperAccount = await getGatekeeperAccountKey(
       this.gatekeeperAuthority.publicKey,
@@ -228,6 +283,17 @@ export class GatekeeperService {
       this.gatekeeperAuthority
     );
 
+    if (!this.retrieveTokenAfterAction) {
+      return new GatewayToken(
+        gatekeeperAccount,
+        this.gatekeeperNetwork,
+        owner,
+        State.ACTIVE,
+        gatewayTokenKey,
+        PROGRAM_ID,
+        expireTime
+      );
+    }
     return this.getGatewayTokenOrError(gatewayTokenKey);
   }
 
