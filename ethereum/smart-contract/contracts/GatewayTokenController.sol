@@ -18,7 +18,6 @@ contract GatewayTokenController is IGatewayTokenController {
 
     EnumerableSet.AddressSet private gatewayTokens;
     address public override identityAdmin;
-    address public flagsStorage;
 
     // Mapping from user address to blacklisted boolean
     mapping(address => bool) private _isBlacklisted;
@@ -33,11 +32,8 @@ contract GatewayTokenController is IGatewayTokenController {
     * @dev Gateway Token Controller contract constructor. 
     * Grants admin role to contract deployer
     */
-    constructor(address _flagsStorage) public {
+    constructor() public {
         identityAdmin = msg.sender;
-
-        require(_flagsStorage != address(0), "Incorrect FlagsStorage address");
-        flagsStorage = _flagsStorage;
     }
 
     // ===========  ADMIN CONTROLL SECTION ============
@@ -136,8 +132,8 @@ contract GatewayTokenController is IGatewayTokenController {
     * @param _name Gateway Token name
     * @param _symbol Gateway Token symbol
     */
-    function createGatekeeperNetwork(string memory _name, string memory _symbol, bool _isDAOGoverned, address _daoExecutor, address trustedForwarder) public override returns (address tokenAddress) {
-        tokenAddress = address(new GatewayToken(_name, _symbol, msg.sender, _isDAOGoverned, _daoExecutor, flagsStorage, trustedForwarder));
+    function createGatekeeperNetwork(string memory _name, string memory _symbol, bool _isDAOGoverned, address _daoExecutor) public override returns (address tokenAddress) {
+        tokenAddress = address(new GatewayToken(_name, _symbol, msg.sender, _isDAOGoverned, _daoExecutor));
         gatewayTokens.add(tokenAddress);
 
         emit GatekeeperNetworkCreated(tokenAddress, _name, _symbol, msg.sender);

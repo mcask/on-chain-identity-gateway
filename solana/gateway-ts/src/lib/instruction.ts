@@ -18,7 +18,6 @@ import { Active, Frozen, GatewayTokenState, Revoked } from "./GatewayTokenData";
 class AddGatekeeper extends Assignable {}
 class IssueVanilla extends Assignable {
   seed?: Uint8Array;
-  expireTime?: number;
 }
 class SetState extends Assignable {
   state!: GatewayTokenState;
@@ -28,7 +27,7 @@ class UpdateExpiry extends Assignable {
 }
 class RevokeGatekeeper extends Assignable {}
 
-export class GatewayInstruction extends Enum {
+class GatewayInstruction extends Enum {
   addGatekeeper?: AddGatekeeper;
   issueVanilla?: IssueVanilla;
   setState?: SetState;

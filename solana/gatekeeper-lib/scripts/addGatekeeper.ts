@@ -9,7 +9,7 @@ const mySecretKey = require(path.join(
   ".config",
   "solana",
   // gatekeeper network key
-  "gatbGF9DvLAw3kWyn1EmH5Nh1Sqp8sTukF7yaQpSc71.json" //"id.json"
+  "gatsGgZznicBQq9ybbygjizWvq5i3pTzrjTE6Cafz36.json" //"id.json"
 ));
 const myKeypair = Keypair.fromSecretKey(Buffer.from(mySecretKey));
 

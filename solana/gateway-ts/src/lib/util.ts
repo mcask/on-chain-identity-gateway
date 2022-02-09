@@ -81,7 +81,7 @@ function fromGatewayTokenState(state: GatewayTokenState): State {
   throw new Error("Unrecognised state " + JSON.stringify(state));
 }
 
-export const dataToGatewayToken = (
+const dataToGatewayToken = (
   data: GatewayTokenData,
   publicKey: PublicKey
 ): GatewayToken =>
@@ -180,14 +180,13 @@ export const findGatewayToken = async (
  * @param gatewayTokenAddress The address of the gateway token
  * @param callback The callback to register
  * @param commitment The solana commitment level at which to register gateway token changes. Defaults to 'confirmed'
- * @return The subscription id
  */
 export const onGatewayTokenChange = (
   connection: Connection,
   gatewayTokenAddress: PublicKey,
   callback: (gatewayToken: GatewayToken) => void,
   commitment: Commitment = SOLANA_COMMITMENT
-): number => {
+) => {
   const accountCallback = (accountInfo: AccountInfo<Buffer>) => {
     const gatewayToken = dataToGatewayToken(
       GatewayTokenData.fromAccount(accountInfo.data),
@@ -195,22 +194,8 @@ export const onGatewayTokenChange = (
     );
     callback(gatewayToken);
   };
-  return connection.onAccountChange(
-    gatewayTokenAddress,
-    accountCallback,
-    commitment
-  );
+  connection.onAccountChange(gatewayTokenAddress, accountCallback, commitment);
 };
-
-/**
- * Stops listening to gateway state changes
- * @param connection A solana connection object
- * @param id The subscription id to deregister
- */
-export const removeAccountChangeListener = (
-  connection: Connection,
-  id: number
-): Promise<void> => connection.removeAccountChangeListener(id);
 
 /**
  * Lookup the gateway token at a given address
